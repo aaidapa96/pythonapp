@@ -1,19 +1,26 @@
+import os
+from azure.storage.blob import BlobServiceClient
 from flask import Flask, render_template
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
-app = Flask(__name)
+app = Flask(__name__)
 
 @app.route('/')
 def display_image():
-    # Azure Blob Storage connection string
-    connection_string = "YOUR_CONNECTION_STRING"
+    # Azure Storage Account Connection String
+    connection_string = "your_connection_string_here"
+
+    # Container and Image Name
+    container_name = "your_container_name"
+    image_name = "your_image_name.jpg"
 
     # Create a BlobServiceClient
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
 
-    # Replace 'your-container' and 'your-image.jpg' with your container and image name
-    container_name = "your-container"
-    blob_name = "your-image.jpg"
+    # Get the blob URL
+    blob_url = f"https://{blob_service_client.account_name}.blob.core.windows.net/{container_name}/{image_name}"
 
-    # Create a BlobClient to retrieve the image
-    blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name
+    # Render HTML with the image URL
+    return render_template('index.html', image_url=blob_url)
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=80)
